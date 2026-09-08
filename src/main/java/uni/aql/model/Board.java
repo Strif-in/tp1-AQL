@@ -7,10 +7,11 @@ public class Board {
 
     private Cell[][] cells = new Cell[3][3];
 
+    private int turn = 0;
     private Player winner;
     private GameState state;
     private Player currentTurn;
-    private enum GameState { IN_PROGRESS, FINISHED };
+    private enum GameState { IN_PROGRESS, FINISHED }
 
     public Board() {
         restart();
@@ -23,6 +24,7 @@ public class Board {
         clearCells();
         winner = null;
         currentTurn = Player.X;
+        turn = 0;
         setInProgressMode();
     }
 
@@ -37,6 +39,15 @@ public class Board {
      */
     public void mark( int row, int col ) {
         if(isValid(row, col)) {
+
+            // Tie condition Added
+            if (turn >= 8) {
+                setInFinishedMode();
+                return;
+            }
+
+            turn += 1;
+
             cells[row][col].setValue(currentTurn);
 
             if(isWinningMoveByPlayer(currentTurn, row, col)) {
@@ -50,12 +61,16 @@ public class Board {
         }
     }
 
-    public void setCells(Cell[][] cells) {
-        this.cells = cells;
-    }
-
     public Cell[][] getCells() {
         return cells;
+    }
+
+    public void setTurn(int turn) {
+        this.turn = turn;
+    }
+
+    public int getTurn() {
+        return turn;
     }
 
     public Player getWinner() {
