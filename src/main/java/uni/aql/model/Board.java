@@ -11,7 +11,6 @@ public class Board {
     private Player winner;
     private GameState state;
     private Player currentTurn;
-    private enum GameState { IN_PROGRESS, FINISHED }
 
     public Board() {
         restart();
@@ -84,6 +83,7 @@ public class Board {
     public void setCurrentTurn(Player currentTurn) {
         this.currentTurn = currentTurn;
     }
+
     public GameState getState() {
         return state;
     }
@@ -115,19 +115,11 @@ public class Board {
     }
 
     private boolean isValid(int row, int col ) {
-        if( state == GameState.FINISHED ) {
-            return false;
-        } else if( isOutOfBounds(row) || isOutOfBounds(col) ) {
-            return false;
-        } else if( isCellValueAlreadySet(row, col) ) {
-            return false;
-        } else {
-            return true;
-        }
+        return state != GameState.FINISHED && isOutOfBounds(row) && isOutOfBounds(col) && !isCellValueAlreadySet(row, col);
     }
 
     private boolean isOutOfBounds(int idx) {
-        return idx < 0 || idx > 2;
+        return idx >= 0 && idx <= 2;
     }
 
     private boolean isCellValueAlreadySet(int row, int col) {
@@ -136,29 +128,41 @@ public class Board {
 
 
     /**
-     * Algorithm adapted from http://www.ntu.edu.sg/home/ehchua/programming/java/JavaGame_TicTacToe.html
-     * @param player
-     * @param currentRow
-     * @param currentCol
+     * Algorithm adapted from <a href="http://www.ntu.edu.sg/home/ehchua/programming/java/JavaGame_TicTacToe.html"/>
+     * @param player Player that might win
+     * @param currentRow int Row played by Player
+     * @param currentCol int Col played by player
      * @return true if <code>player</code> who just played the move at the <code>currentRow</code>, <code>currentCol</code>
      *              has a tic tac toe.
      */
     private boolean isWinningMoveByPlayer(Player player, int currentRow, int currentCol) {
+        return (checkColWinByPlayer(player, currentCol) || checkRowWinByPlayer(player, currentRow) || checkDiagonalByPlayer(player) || checkAntiDiagonalByPlayer(player) );
+    }
 
-        return (cells[currentRow][0].getValue() == player         // 3-in-the-row
-                && cells[currentRow][1].getValue() == player
-                && cells[currentRow][2].getValue() == player
-                || cells[0][currentCol].getValue() == player      // 3-in-the-column
-                && cells[1][currentCol].getValue() == player
-                && cells[2][currentCol].getValue() == player
-                || currentRow == currentCol            // 3-in-the-diagonal
-                && cells[0][0].getValue() == player
-                && cells[1][1].getValue() == player
-                && cells[2][2].getValue() == player
-                || currentRow + currentCol == 2    // 3-in-the-opposite-diagonal
-                && cells[0][2].getValue() == player
-                && cells[1][1].getValue() == player
-                && cells[2][0].getValue() == player);
+    private boolean checkRowWinByPlayer(Player player, int currentRow){
+        for (int i = 0; i < 3; i++){
+            if (cells[currentRow][i].getValue() != player){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean checkColWinByPlayer(Player player, int currentCol){
+        for (int i = 0; i < 3; i++){
+            if (cells[i][currentCol].getValue() != player){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean checkDiagonalByPlayer(Player player){
+        return cells[0][0].getValue() == player && cells[1][1].getValue() == player && cells[2][2].getValue() == player;
+    }
+
+    private boolean checkAntiDiagonalByPlayer(Player player){
+        return  cells[0][2].getValue() == player && cells[1][1].getValue() == player && cells[2][0].getValue() == player;
     }
 
     private void flipCurrentTurn() {
