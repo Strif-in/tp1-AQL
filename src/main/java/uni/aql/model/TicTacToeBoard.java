@@ -1,13 +1,21 @@
 package uni.aql.model;
 
+import static java.lang.Math.min;
+
 public class TicTacToeBoard extends AbstractBoard {
 
     public TicTacToeBoard(int height, int width) {
-        super();
         this.cells = new Cell[height][width];
         this.height = height;
         this.width = width;
         this.maxTurns = height * width;
+        this.nbWinCells = min(height, width);
+        restart();
+    }
+
+    public TicTacToeBoard(int height, int width, int nbWinCells) {
+        new TicTacToeBoard(height, width);
+        this.nbWinCells = nbWinCells;
         restart();
     }
 
@@ -25,32 +33,30 @@ public class TicTacToeBoard extends AbstractBoard {
     }
 
     @Override
-    boolean checkRowWinByPlayer(Player player, int currentRow){
+    boolean checkRowWinByPlayer(Player player, int currentRow, int nbWinCells) {
+        int cptWin = 0;
         for (int i = 0; i < width; i++){
-            if (cells[currentRow][i].getValue() != player){
-                return false;
-            }
+            cptWin = cells[currentRow][i].getValue() == player ? cptWin + 1 : 0;
         }
-        return true;
+        return cptWin >= nbWinCells;
     }
 
     @Override
-    boolean checkColWinByPlayer(Player player, int currentCol){
+    boolean checkColWinByPlayer(Player player, int currentCol, int nbWinCells) {
+        int cptWin = 0;
         for (int i = 0; i < height; i++){
-            if (cells[i][currentCol].getValue() != player){
-                return false;
-            }
+            cptWin = cells[i][currentCol].getValue() == player ? cptWin + 1 : 0;
         }
-        return true;
+        return cptWin >= nbWinCells;
     }
 
     @Override
-    boolean checkDiagonalByPlayer(Player player){
+    boolean checkDiagonalByPlayer(Player player, int nbWinCells) {
         return cells[0][0].getValue() == player && cells[1][1].getValue() == player && cells[2][2].getValue() == player;
     }
 
     @Override
-    boolean checkAntiDiagonalByPlayer(Player player){
+    boolean checkAntiDiagonalByPlayer(Player player, int nbWinCells) {
         return  cells[0][2].getValue() == player && cells[1][1].getValue() == player && cells[2][0].getValue() == player;
     }
 }

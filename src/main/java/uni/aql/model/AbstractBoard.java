@@ -10,6 +10,7 @@ public abstract class AbstractBoard {
     protected int turn = 0;
     protected int height;
     protected int width;
+    protected int nbWinCells;
     protected GameState state;
     protected Player winner;
     protected Player currentTurn;
@@ -71,7 +72,6 @@ public abstract class AbstractBoard {
         return getState().equals(GameState.FINISHED);
     }
 
-
     protected void play( int row, int col ) {
         if(isValid(row, col)) {
 
@@ -115,16 +115,19 @@ public abstract class AbstractBoard {
      *              has a tic tac toe.
      */
     protected boolean isWinningMoveByPlayer(Player player, int currentRow, int currentCol){
-        return (checkColWinByPlayer(player, currentCol) || checkRowWinByPlayer(player, currentRow) || checkDiagonalByPlayer(player) || checkAntiDiagonalByPlayer(player) );
+        return (checkColWinByPlayer(player, currentCol, nbWinCells)
+                || checkRowWinByPlayer(player, currentRow, nbWinCells)
+                || checkDiagonalByPlayer(player, nbWinCells)
+                || checkAntiDiagonalByPlayer(player, nbWinCells) );
     }
 
-    abstract boolean checkRowWinByPlayer(Player player, int currentRow);
+    abstract boolean checkRowWinByPlayer(Player player, int currentRow, int nbWinCells);
 
-    abstract boolean checkColWinByPlayer(Player player, int currentCol);
+    abstract boolean checkColWinByPlayer(Player player, int currentCol, int nbWinCells);
 
-    abstract boolean checkDiagonalByPlayer(Player player);
+    abstract boolean checkDiagonalByPlayer(Player player, int nbWinCells);
 
-    abstract boolean checkAntiDiagonalByPlayer(Player player);
+    abstract boolean checkAntiDiagonalByPlayer(Player player, int nbWinCells);
 
     protected void flipCurrentTurn() {
         currentTurn = currentTurn == X ? O : X;
