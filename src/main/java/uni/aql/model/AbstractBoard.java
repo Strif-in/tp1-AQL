@@ -125,13 +125,49 @@ public abstract class AbstractBoard {
                 || checkAntiDiagonalByPlayer(player, currentRow, currentCol));
     }
 
-    abstract boolean checkRowWinByPlayer(Player player, int currentRow);
 
-    abstract boolean checkColWinByPlayer(Player player, int currentCol);
+    protected boolean checkRowWinByPlayer(Player player, int currentRow) {
+        int cptWin = 0;
+        for (int i = 0; i < width; i++){
+            cptWin = countMarkSequence(player, currentRow, i, cptWin);
+            if (isCountWin(cptWin)) return true;
+        }
+        return false;
+    }
 
-    abstract boolean checkDiagonalByPlayer(Player player, int currentRow, int currentCol);
 
-    abstract boolean checkAntiDiagonalByPlayer(Player player, int currentRow, int currentCol);
+    protected boolean checkColWinByPlayer(Player player, int currentCol) {
+        int cptWin = 0;
+        for (int i = 0; i < height; i++){
+            cptWin = countMarkSequence(player, i, currentCol, cptWin);
+            if (isCountWin(cptWin)) return true;
+        }
+        return false;
+    }
+
+
+    protected boolean checkDiagonalByPlayer(Player player, int currentRow, int currentCol) {
+        int cptWin = 0;
+        int offset = Math.min(currentRow, currentCol);
+
+        for (int i = currentRow - offset, j = currentCol - offset; i < height && j < width; i++, j++) {
+            cptWin = countMarkSequence(player, i, j, cptWin);
+            if (isCountWin(cptWin)) return true;
+        }
+        return false;
+    }
+
+
+    protected boolean checkAntiDiagonalByPlayer(Player player, int currentRow, int currentCol) {
+        int cptWin = 0;
+        int offset = Math.min(currentRow, width - 1 - currentCol);
+
+        for (int i = currentRow - offset, j = currentCol + offset; i < height && j >= 0; i++, j--) {
+            cptWin = countMarkSequence(player, i, j, cptWin);
+            if (isCountWin(cptWin)) return true;
+        }
+        return false;
+    }
 
     protected int countMarkSequence(Player player, int row, int col, int cptWin){
         return player.piece().matches(cells[row][col].getValue()) ? cptWin + 1 : 0;

@@ -12,7 +12,7 @@ class FixedBoardTest {
 
     @BeforeEach()
     void setup(){
-        this.ticTacToeBoard = new TicTacToeBoard(3,3);
+        this.ticTacToeBoard = new TicTacToeBoard();
 
     }
 
@@ -195,6 +195,23 @@ class FixedBoardTest {
         assertEquals(5, ticTacToeBoard.getTurn());
     }
 
+    @Test
+    void testWinAntiDiagonalFromCenter() {
+        // Setup: X needs to win on the anti-diagonal (0,2 to 2,0)
+        // The final winning move must be the center cell (1,1) so offset > 0
+        ticTacToeBoard.mark(0, 2); // Player X
+        ticTacToeBoard.mark(0, 1); // Player O
+        ticTacToeBoard.mark(2, 0); // Player X
+        ticTacToeBoard.mark(1, 0); // Player O
+
+        // Final winning move in the center
+        ticTacToeBoard.mark(1, 1); // Player X wins
+
+        assertEquals(playerX, ticTacToeBoard.getWinner());
+        assertEquals(playerX, ticTacToeBoard.getCurrentTurn());
+        assertTrue(ticTacToeBoard.isInFinishedMode());
+        assertFalse(ticTacToeBoard.isInProgressMode());
+    }
 
     @Test
     void testFinishedGameTie() {
@@ -227,6 +244,10 @@ class FixedBoardTest {
         ticTacToeBoard.setCurrentTurn(playerO);
         ticTacToeBoard.mark(1,2); // Player 0
 
+        assertEquals(playerX, ticTacToeBoard.getCurrentTurn());
+        assertTrue(ticTacToeBoard.isInProgressMode());
+
+        ticTacToeBoard.mark(1,2); // Player X
         assertEquals(playerX, ticTacToeBoard.getCurrentTurn());
         assertTrue(ticTacToeBoard.isInProgressMode());
     }
