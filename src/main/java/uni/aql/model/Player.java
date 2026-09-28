@@ -1,7 +1,4 @@
 package uni.aql.model;
 
-public enum Player {
-    X ,
-    O
-}
+public record Player(Piece piece) {}
 

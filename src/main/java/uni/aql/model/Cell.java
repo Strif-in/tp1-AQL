@@ -2,13 +2,17 @@ package uni.aql.model;
 
 public class Cell {
 
-    private Player value;
+    private Piece piece;
 
-    public Player getValue() {
-        return value;
+    public boolean isNotEmpty() {
+        return piece != null;
     }
 
-    public void setValue(Player value) {
-        this.value = value;
+    public void setValue(Piece piece) {
+        this.piece = piece;
+    }
+
+    public Piece getValue() {
+        return this.piece;
     }
 }

@@ -1,17 +1,20 @@
 package uni.aql.model;
 
-import static uni.aql.model.Player.O;
-import static uni.aql.model.Player.X;
+import java.util.List;
 
 public abstract class AbstractBoard {
     protected Cell[][] cells;
+    protected int height;
+    protected int width;
 
     protected int maxTurns;
     protected int turn = 0;
-    protected int height;
-    protected int width;
+    protected int offsetTurn = 0;
+
     protected int nbWinCells;
     protected GameState state;
+
+    protected List<Player> players;
     protected Player winner;
     protected Player currentTurn;
 
@@ -21,7 +24,7 @@ public abstract class AbstractBoard {
     public void restart() {
         clearCells();
         winner = null;
-        currentTurn = Player.X;
+        currentTurn = players.getFirst();
         turn = 0;
         setInProgressMode();
     }
@@ -48,6 +51,7 @@ public abstract class AbstractBoard {
 
     public void setCurrentTurn(Player currentTurn) {
         this.currentTurn = currentTurn;
+        this.offsetTurn = players.indexOf(currentTurn);
     }
 
     public GameState getState() {
@@ -72,7 +76,7 @@ public abstract class AbstractBoard {
         return getState().equals(GameState.FINISHED);
     }
 
-    protected void play( int row, int col ) {
+    protected void mark( int row, int col ) {
         if(isValid(row, col)) {
 
             if (turn >= maxTurns - 1) {
@@ -82,7 +86,7 @@ public abstract class AbstractBoard {
 
             turn += 1;
 
-            cells[row][col].setValue(currentTurn);
+            cells[row][col].setValue(currentTurn.piece());
 
             if(isWinningMoveByPlayer(currentTurn, row, col)) {
                 setInFinishedMode();
@@ -103,7 +107,7 @@ public abstract class AbstractBoard {
     }
 
     protected boolean isCellValueAlreadySet(int row, int col) {
-        return cells[row][col].getValue() != null;
+        return cells[row][col].isNotEmpty();
     }
 
     /**
@@ -115,22 +119,30 @@ public abstract class AbstractBoard {
      *              has a tic tac toe.
      */
     protected boolean isWinningMoveByPlayer(Player player, int currentRow, int currentCol){
-        return (checkColWinByPlayer(player, currentCol, nbWinCells)
-                || checkRowWinByPlayer(player, currentRow, nbWinCells)
-                || checkDiagonalByPlayer(player, nbWinCells)
-                || checkAntiDiagonalByPlayer(player, nbWinCells) );
+        return (checkColWinByPlayer(player, currentCol)
+                || checkRowWinByPlayer(player, currentRow)
+                || checkDiagonalByPlayer(player, currentRow, currentCol)
+                || checkAntiDiagonalByPlayer(player, currentRow, currentCol));
     }
 
-    abstract boolean checkRowWinByPlayer(Player player, int currentRow, int nbWinCells);
+    abstract boolean checkRowWinByPlayer(Player player, int currentRow);
 
-    abstract boolean checkColWinByPlayer(Player player, int currentCol, int nbWinCells);
+    abstract boolean checkColWinByPlayer(Player player, int currentCol);
 
-    abstract boolean checkDiagonalByPlayer(Player player, int nbWinCells);
+    abstract boolean checkDiagonalByPlayer(Player player, int currentRow, int currentCol);
 
-    abstract boolean checkAntiDiagonalByPlayer(Player player, int nbWinCells);
+    abstract boolean checkAntiDiagonalByPlayer(Player player, int currentRow, int currentCol);
+
+    protected int countMarkSequence(Player player, int row, int col, int cptWin){
+        return player.piece().matches(cells[row][col].getValue()) ? cptWin + 1 : 0;
+    }
+
+    protected boolean isCountWin(int cptWin){
+        return cptWin >= nbWinCells;
+    }
 
     protected void flipCurrentTurn() {
-        currentTurn = currentTurn == X ? O : X;
+        currentTurn = players.get((turn + offsetTurn)%players.size());
     }
 
     protected void clearCells() {
